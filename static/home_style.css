@@ -1,0 +1,169 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    border: border-box;
+}
+
+.navbar{
+    height: 160px;
+    background-color: #29000a;
+    color: #d2d2c8;
+    display: flex;
+}
+
+.nav-logo{
+    height: 160px;
+    width: 350px;
+}
+
+.logo img{
+    height: 150px;
+    width: 350px;
+}
+
+.wrapper {
+    position: absolute;
+    height: 80px;
+    width: 620px;
+    background-color: #d2d2c8;
+    border-radius: 17px;
+    box-shadow: 3px 7px 2px rgba(0, 0, 0, 0.1);
+    top: 45px;
+    right: 45px;
+}
+
+.wrapper ul {
+    display: flex;
+    justify-content: space-between;
+}
+
+.wrapper ul li {
+    position: relative;
+    line-height: 85px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.wrapper .fa-solid{
+    color: #29000a;
+}
+
+.tooltip {
+    position: absolute;
+    left: 0;
+    top: -30px;
+    height: 40px;
+    width: 100px;
+    background: #d2d2c8;
+    border-radius: 15px;
+    text-align: center;
+    line-height: 30px;
+    font-size: 14px;
+    color: #29000a;
+    font-weight: bold;
+    pointer-events: none;
+    margin: 0 10px;
+    transition: 0.5s;
+    border: 6px solid #29000a;
+    opacity: 0;
+}
+
+.wrapper ul li:hover .tooltip {
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+.wrapper ul li a {
+    display: block;
+    color: #000;
+    font-size: 1.5em;
+    margin: 0 50px;
+}
+
+.screen {
+    height: 700px;
+    background-image: url("images/tourism_collage.png");
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.screen h2{
+    color: #d2d2c8;
+    text-shadow:
+        -2px -2px 0 #29000a,
+         2px -2px 0 #29000a,
+        -2px  2px 0 #29000a,
+         2px  2px 0 #29000a;
+    font-size: 100px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.highlights{
+    height: 500px;
+    background-color: #29000a;
+    padding: 10px;
+}
+
+.box{
+    height: 300px;
+    width: 70%;
+    background-color: #d2d2c8;
+    border: 5px solid #807245;
+    border-radius: 5px;
+    margin: 20px;
+}
+
+.heading{
+    height: 40px;
+    background-color: #807245;
+    font-weight: bolder;
+    font-size: 30px;
+    text-align: center;
+    color: #d2d2c8;
+}
+
+.find-buddy{
+    padding-top: 10px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #d2d2c8;
+}
+
+.people{
+    height: 90%;
+    width: 45%;
+    margin: 10px;
+    border: 2px solid #807245;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #29000a;
+    background-color: #807245;
+}
+
+.people a{
+    color: #29000a;
+}
+
+.new{
+    background-image: url("images/new_people_travel.jpg");
+    background-size: cover;
+}
+
+.known{
+    background-image: url("images/known_people_travel.jpg");
+    background-size: cover;
+}
+
+.my_created_trips{
+    background-image: url("images/my_trips.png");
+    background-size: cover;
+}

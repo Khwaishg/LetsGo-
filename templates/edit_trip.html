@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Trip</title>
+    <link rel="stylesheet" href="/static/travel_style.css">
+</head>
+<body>
+<div class="complete">
+<h2>Edit Trip</h2>
+<form method="post">
+    <input type="text" name="destination" value="{{trip.destination}}" required>
+    <input type="date" name="start_date" value="{{trip.start_date}}" required>
+    <input type="date" name="end_date" value="{{trip.end_date}}" required>
+    <input type="number" name="min_age" value="{{trip.min_age}}" required>
+    <input type="number" name="max_age" value="{{trip.max_age}}" required>
+
+    <button type="submit">Update</button>
+</form>
+</div>
+
+</body>
+</html>

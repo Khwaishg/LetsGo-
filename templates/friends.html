@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo Friends</title>
+    <link rel="stylesheet" href="/static/friends_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>My Friends</h1>
+
+        {% if friends %}
+            <div class="card">
+                <img id="profilePic" src="">
+                <h2 id="username"></h2>
+
+                <!-- CHAT BUTTON -->
+                <a id="chatBtn" class="btn">Chat</a>
+            </div>
+
+            <p class="hint">Use arrow ( <= and => ) keys</p>
+            <a href="{{ url_for('add_friends') }}" class="btn">Add Friends</a>
+
+        {% else %}
+            <div class="empty">
+                <p>No friends yet</p>
+                <a href="{{ url_for('add_friends') }}" class="btn">Add Friends</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if friends %}
+
+    <!-- JSON friends data -->
+    <script type="application/json" id="friends-data">
+        {{ friends | tojson }}
+    </script>
+
+    <script>
+        const friends = JSON.parse(document.getElementById("friends-data").textContent);
+        let index = 0;
+
+        const nameEl = document.getElementById("username");
+        const picEl = document.getElementById("profilePic");
+        const chatBtn = document.getElementById("chatBtn");
+
+        function update() {
+            const friend = friends[index];
+
+            nameEl.textContent = friend.username;
+            picEl.src = friend.profile_pic;
+
+            //  Set chat link dynamically
+            chatBtn.href = "/chat/" + friend.id;
+        }
+
+        update();
+
+        document.addEventListener("keydown", e => {
+            if (e.key === "ArrowRight") {
+                index = (index + 1) % friends.length;
+                update();
+            }
+
+            if (e.key === "ArrowLeft") {
+                index = (index - 1 + friends.length) % friends.length;
+                update();
+            }
+        });
+    </script>
+
+    {% endif %}
+</body>
+</html>

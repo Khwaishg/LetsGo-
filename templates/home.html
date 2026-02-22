@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo - Home page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href = "/static/home_style.css">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="nav-logo">
+                <div class="logo">
+                    <a href="{{ url_for('home') }}"><img src = "/static/images/logo.png"></a>
+                </div>
+            </div>
+            <div class="wrapper">
+                <ul>
+                <li>
+                <a href="{{url_for('friends')}}"> 
+                    <i class="fa-solid fa-comment-dots"></i>
+                </a>
+                <span class="tooltip">Chat</span>
+                </li>
+                <li>
+                <a href="{{ url_for('friends') }}">
+                    <i class="fa-solid fa-user-group"></i>
+                </a>
+                <span class="tooltip">Friends</span>
+                </li>
+                <li>
+                <a href="{{ url_for('home') }}">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </a>
+                <span class="tooltip">Home</span>
+                </li>
+                <li>
+                <a href="{{ url_for('notifications') }}">
+                    <i class="fa-solid fa-bell"></i>
+                </a>
+                <span class="tooltip">Notifications</span>
+                </li>
+                <li>
+                <a href="{{ url_for('profile') }}">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+                <span class="tooltip">Profile</span>
+                </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="screen">
+            <h2> Ready to Explore? </h2>
+        </div>
+        <div class="highlights">
+            <div class="box">
+                <div class="heading">Find your travel buddy</div>
+                <div class="find-buddy">
+                    <span class="new people"><a href = "{{url_for('travel_page', travel_type='new')}}">Travel with new people</a></span>
+                    <span class="known people"><a href = "{{url_for('travel_page', travel_type='known')}}">Travel with known people</a></span>
+                    <span class="my_created_trips people"><a href="{{url_for('my_trips')}}">My Trips</a></span>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>I'm still working on this website... Help me by suggesting new features and replacing old features... Thank you for your support...</p>
+    </footer>
+</body>
+</html>

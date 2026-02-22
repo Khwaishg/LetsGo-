@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo Add Friends</title>
+    <link rel="stylesheet" href="/static/add_friends_style.css">
+</head>
+<body>
+    <div class="container">
+        <a href="{{url_for('friends')}}" class = "back"> Go Back </a>
+        <h1>Add Friends</h1>
+        {% if users %}
+            <div class="card">
+                <img id = "profilePic" src="{{url_for('static', filename='default.jpg')}}">
+                <h2 id="username"></h2>
+                <a id = "addBtn" href="/add_friend/{{users[0].id}}" class="btn">Add Friend</a>
+            </div>
+        {% else %}
+            <p> No users available</p>
+        {% endif %}
+    </div>
+
+    {% if users %}
+    <script type = "application/json" id = "users-data">
+        {{users | tojson}}
+    </script>
+    <script>
+        const users = JSON.parse(document.getElementById("users-data").textContent);
+        console.log(users);
+        let index = 0;
+        const nameE1 = document.getElementById("username");
+        const picE1 = document.getElementById("profilePic");
+        const btnE1 = document.getElementById("addBtn");
+
+        function update(){
+            nameE1.textContent=users[index].username;
+            picE1.src = users[index].profile_pic;
+            btnE1.href = "/add_friend/" + users[index].id;
+        }
+
+        update();
+
+        document.addEventListener("keydown", e=>{
+            if(!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+            if(!users || users.length === 0) return;
+            e.preventDefault();
+            if(e.key==="ArrowRight"){
+                index=(index+1)%users.length;
+                update();
+            }
+            if(e.key==="ArrowLeft"){
+                index=(index-1 + users.length)%users.length;
+                update();
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

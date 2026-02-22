@@ -1,0 +1,28 @@
+1. Username goes between box of username input
+2. Animation between login and signup page and vice versa
+3. Toggle between light and dark mode
+4. Random password generator
+5. Show and hide password
+6. Phonebook for safety purposes 
+7. Verify profile 
+8. Ticket exchange
+9. Students Corner
+10. Share your experience
+11. Add friend 
+12. Travel buddy feedback 
+13. Users can vote on new features of the app
+14. Guide 
+15. Eyes follow the mouse pointer
+16. Lamp gets angry on wrong password
+17. Pull chain sound effect
+18. Search bar for friends
+
+profile 
+age
+gender
+profile pic
+Student 
+bio/about meee
+my past trips
+bucket list/ wishlist
+followers and following

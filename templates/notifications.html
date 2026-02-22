@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo Notifications</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='notifications_style.css')}}">
+</head>
+<body>
+    <div class="container">
+        <h2>Notifications</h2>
+    <div style="text-align:right; margin-bottom:10px;">
+        <a href="/clear_notifications" class="btn reject">Clear All</a>
+    </div>
+
+        {% if notifications|length == 0 %}
+            <p class="empty"> No notifications yet </p>
+        {% endif %}
+
+        {% for n in notifications %}
+
+        <!-- 🔹 Friend Request -->
+        {% if n.type == 'friend' %}
+        <div class="card">
+            <img src="{{url_for('static', filename='profile_pics/' ~ (n.profile_pic or 'default.jpg'))}}">
+            <div class="info">
+                <h3>{{n.username}}</h3>
+                <p>sent you a friend request</p>
+            </div>
+            <div class="actions">
+                <a href="/accept/{{n.id}}" class="btn accept">Accept</a>
+                <a href="/reject/{{n.id}}" class="btn reject">Reject</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 🔹 Travel Notification -->
+        {% if n.type == 'travel' %}
+        <div class="card">
+            <div class="info">
+                <p>{{n.message}}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+    </div>
+</body>
+</html>

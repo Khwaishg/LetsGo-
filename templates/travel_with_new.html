@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo - Travel with new people </title>
+    <link rel="stylesheet" href="/static/travel_style.css">
+</head>
+<body>
+  <div class="complete">
+    <div class="top_bar">
+        <h2> Available Trips</h2>
+    </div>
+
+    <form class="filter-box" method="get">
+        <input type="text" name="destination" placeholder="Destination">
+        <input type="date" name="start_date">
+        <input type="date" name="end_date">
+        <input type="number" name="min_age" placeholder="Min age">
+        <input type="number" name="max_age" placeholder="Max age">
+        <button type="submit">Apply</button>
+    </form>
+
+    <div class="trip-list">
+    {% for r in requests %}
+        <div class="trip-card">
+            <img src="{{ r.profile_pic if r.profile_pic else '/static/profile_pics/default.jpg' }}">
+            <h3>{{r.username}}</h3>
+            <p><strong>Destination: </strong>{{r.destination}}</p>
+            <p><strong>Dates: </strong>{{r.start_date}} -> {{r.end_date}}</p>
+            <p><strong>Age range: </strong>{{r.min_age}} - {{r.max_age}}</p>
+            <div class="travel-actions">
+                <a href="/respond_trip/{{r.id}}/accepted" class="btn accept">Accept</a>
+                <a href="/respond_trip/{{r.id}}/rejected" class="btn reject">Reject</a>
+            </div>
+        </div>
+    {% else %}
+        <p>No matching travel plans found</p>
+    {% endfor %}
+    </div>
+
+    <div class="add-trip-section">
+        <div class="add-trip-btn" onclick="toggleTripForm()">
+            <span class="plus"> + </span>
+            <span class="add-trip-text">Add a New Trip</span>
+        </div>
+
+        <div class="add-trip-form" id="tripForm">
+            <h3>Create a new travel plan</h3>
+            <form method="POST" action="/add_trip/new">
+                <input type="text" name="destination" placeholder="Destination" required>
+                <input type="date" name="start_date" required>
+                <input type="date" name="end_date" required>
+                <input type="number" name="min_age" placeholder="Min age" required>
+                <input type="number" name="max_age" placeholder="Max age" required>
+                <button type="submit">Create Trip</button>
+            </form>
+        </div>
+    </div>
+  </div>
+
+    <script>
+        function toggleFilter(){
+            document.querySelector(".filter-box").classList.toggle("show");
+        }
+        function toggleTripForm() {
+            const form = document.getElementById('tripForm');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

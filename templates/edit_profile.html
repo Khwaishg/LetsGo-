@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LetsGo Edit Profile</title>
+  <link rel="stylesheet" href="/static/edit_profile_style.css">
+</head>
+<body>
+<div class="profile-box">
+  <h2>Profile</h2>
+  <form action="/save_profile" method="POST" enctype="multipart/form-data">
+        <p> Add Profile Pic </p>
+        <input type="file" name="profile_pic" accept = "image/png, image/jpeg, image/jpg" required><br>
+        <p> Gender </p>
+          <div class="radio-group">
+            <label><input type="radio" name="gender" value="Male">Male</label>
+            <label><input type="radio" name="gender" value="Female">Female</label>
+            <label><input type="radio" name="gender" value="Others">Others</label>
+          </div><br>
+        <p> Age </p>
+        <input type="number" name="age" required><br>
+        <p> Student </p>
+          <div class="radio-group">
+            <label><input type="radio" name="student" value="Yes">Yes</label>
+            <label><input type="radio" name="student" value="No">No</label>
+          </div><br>
+        <button type="submit">Save Profile</button>
+  </form>
+  <p><b><a href="{{ url_for('home') }}">Go Back to Home</a></b></p>
+</div>
+</body>
+</html>

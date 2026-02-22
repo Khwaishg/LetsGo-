@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LetsGo Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat_style.css') }}">
+</head>
+<body>
+
+<div class="chat-container">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <h3>Chat</h3>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-box" id="chat-box"></div>
+
+    <!-- Message Input -->
+    <form id="chat-form" class="chat-input">
+        <input type="text" id="message" placeholder="Type a message..." required autocomplete="off">
+        <button type="submit">Send</button>
+    </form>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const chatBox = document.getElementById("chat-box");
+    const form = document.getElementById("chat-form");
+    const messageInput = document.getElementById("message");
+
+    const otherUser = "{{ other_user_id }}";  // FIXED
+
+    if (!chatBox || !form || !messageInput) return;
+
+    // Load messages
+    function loadMessages() {
+        fetch("/get_messages/" + otherUser)
+        .then(res => res.json())
+        .then(data => {
+
+            chatBox.innerHTML = "";
+
+            data.forEach(msg => {
+                const div = document.createElement("div");
+                div.classList.add("msg");
+
+                if (msg.sender === "me") {
+                    div.classList.add("sent");
+                } else {
+                    div.classList.add("received");
+                }
+
+                div.innerText = msg.message;
+                chatBox.appendChild(div);
+            });
+
+        })
+        .catch(err => console.log("Error:", err));
+    }
+
+    // Send message
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const text = messageInput.value.trim();
+        if (text === "") return;
+
+        fetch("/send_message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: text,
+                receiver: otherUser   //  FIXED
+            })
+        })
+        .then(() => {
+            messageInput.value = "";
+            loadMessages();
+        })
+        .catch(err => console.log("Error:", err));
+    });
+
+    setInterval(loadMessages, 2000);
+    loadMessages();
+
+});
+</script>
+
+</body>
+</html>

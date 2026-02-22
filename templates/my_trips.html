@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Trips</title>
+    <link rel="stylesheet" href="/static/travel_style.css">
+</head>
+<body>
+
+<div class="complete">
+    <h2>My Created Trips</h2>
+
+    <div class="trip-list">
+{% for t in trips %}
+<div class="trip-card">
+
+    <h3>{{ t.destination }}</h3>
+    <p><strong>Dates:</strong> {{ t.start_date }} → {{ t.end_date }}</p>
+    <p><strong>Age:</strong> {{ t.min_age }} - {{ t.max_age }}</p>
+    <p><strong>Type:</strong> {{ t.travel_type }}</p>
+
+    <p><strong>Status:</strong>
+        {% if t.accepted_count > 0 %}
+            Accepted by {{ t.accepted_count }} people
+        {% else %}
+            Pending
+        {% endif %}
+    </p>
+
+    <a href="/edit_trip/{{t.id}}" class="btn">Edit</a>
+    <a href="/delete_trip/{{t.id}}" class="btn reject">Delete</a>
+
+</div>
+{% else %}
+<p>No trips created</p>
+{% endfor %}
+</div>
+</div>
+
+</body>
+</html>

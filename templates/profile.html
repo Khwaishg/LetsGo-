@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo Profile</title>
+    <link rel="stylesheet" href="/static/profile_style.css">
+</head>
+<body>
+    {% if user and user.profile_saved == 1 %}
+        <div class="complete">
+            <h2>My Profile</h2>
+            {% if user.profile_pic %}
+                <img src = "{{url_for('static', filename='profile_pics/') + user.profile_pic}}" alt="Profile Picture" width="150">
+            {% endif %}
+            <p><b>Username: </b>{{user.username}}</p>
+            <p><b>Gender: </b>{{user.gender}}</p>
+            <p><b>Age: </b>{{user.age}}</p>
+            <p><b>Student: </b>{{user.is_student}}</p>
+            <a href="{{url_for('edit_profile')}}">Edit Profile</a>
+        </div>
+    {% else %}
+        <div class="complete">
+            <h2>Complete Your Profile</h2>
+            <p>Your profile is not saved yet.</p>
+            <a href="{{url_for('edit_profile')}}">Create Profile</a>
+        </div>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetsGo Login</title>
+    <link rel="stylesheet" href="/static/login_style.css">
+</head>
+<body>
+
+<div class="scene">
+  <div class="lamp">
+    <div class="shade" id="shade">
+      <div class="face">
+        <span class="eye"></span>
+        <span class="eye"></span>
+      </div>
+      <div class="mouth"></div>
+    </div>
+
+    <div class="neck"></div>
+    <div class="base"></div>
+
+    <div class="pull" id="pull">
+      <div class="ball"></div>
+    </div>
+  </div>
+
+  <div class="login" id="login">
+    <h2>Welcome Back</h2>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username" required><br><br>
+        <input type="password" id="password" name="password" placeholder="Password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+    <div class="signup">
+        <p> New to LetsGo ?</p>
+        <b><a href="{{ url_for('signup') }}"> Sign Up </a></b>
+    </div>
+  </div>
+</div>
+{% if message %}
+    <script>
+        alert("{{ message }}");
+    </script>
+{% endif %}
+<script>
+  const pull = document.getElementById("pull");
+  const shade = document.getElementById("shade");
+  const login = document.getElementById("login");
+  const password = document.getElementById("password");
+  const eyes = document.querySelectorAll(".eye");
+
+  let isOn = false;
+
+  pull.addEventListener("click", () => {
+    isOn = !isOn;
+    shade.classList.toggle("on", isOn);
+    login.classList.toggle("show", isOn);
+    login.classList.toggle("glow", isOn);
+  });
+
+  password.addEventListener("focus", () => {
+    eyes.forEach(e => e.classList.add("closed"));
+  });
+
+  password.addEventListener("blur", () => {
+    eyes.forEach(e => e.classList.remove("closed")); 
+  });
+
+</script>
+</body>
+</html>
