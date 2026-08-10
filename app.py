@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "secret_key_here"
@@ -42,17 +43,17 @@ def index():
         password = request.form["password"]
         conn = get_db()
         user = conn.execute(
-            "SELECT * FROM users WHERE username=? AND password=?",
-            (username, password)
+            "SELECT * FROM users WHERE username=?",
+            (username, )
         ).fetchone()
         conn.close()
-        if user:
+        if user and check_password_hash(user["password"], password):
             session.clear()
             session["user_id"] = user["id"]
             session["username"] = username
             return redirect(url_for('home'))
         else:
-            message = "User not found. You need to signup."
+            message = "Invalid username or password. You need to signup."
     return render_template("index.html", message=message)
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -65,11 +66,12 @@ def signup():
         if password != confirm_password:
             message = "Passwords do not match."
             return render_template("signup.html", message=message)
+        password_hash = generate_password_hash(password)
         conn = get_db()
         try:
             conn.execute(
                 "INSERT INTO users (username, password, profile_pic, gender, age, is_student) VALUES (?, ?, ?, ?, ?, ?)",
-                (username, password, None, None, None, None)
+                (username, password_hash, None, None, None, None)
             )
             conn.commit()
             user = conn.execute(

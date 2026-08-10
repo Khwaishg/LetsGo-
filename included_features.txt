@@ -1,2 +1,0 @@
-1. when knob is clicked, lamp glows and login form appears
-2. Symbols in navbar of home page are explained
