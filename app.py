@@ -1,14 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
+from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from werkzeug.exceptions import RequestEntityTooLarge
 
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = "secret_key_here"
+app.secret_key = os.environ.get("SECRET_KEY")
 upload_folder = "static/profile_pics"
 app.config["upload_folder"]=upload_folder
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  
 DB_FILE = "users.db"
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return "File too large. Maximum allowed size is 2 MB.", 413
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def get_db():
     conn = sqlite3.connect(DB_FILE)
@@ -88,15 +105,13 @@ def signup():
     return render_template("signup.html", message=message)
 
 @app.route("/home")
+@login_required
 def home():
-    if "username" not in session:
-        return redirect("/")
     return render_template("home.html")
 
 @app.route("/profile")
+@login_required
 def profile():
-    if "username" not in session:
-        return redirect("/")
     conn=get_db()
     user = conn.execute(
         "SELECT username, profile_pic, gender, age, is_student, profile_saved FROM users WHERE username = ?", 
@@ -106,9 +121,8 @@ def profile():
     return render_template("profile.html", user=user)
 
 @app.route("/save_profile", methods=["POST"])
+@login_required
 def save_profile():
-    if "username" not in session:
-        return redirect("/")
     username = session["username"]
     gender = request.form.get("gender")
     age = request.form.get("age")
@@ -129,9 +143,8 @@ def save_profile():
     return redirect("/home")
 
 @app.route("/edit_profile")
+@login_required
 def edit_profile():
-    if "username" not in session:
-        return redirect("/")
     return render_template("edit_profile.html")
 
 def create_friends_table():
@@ -163,9 +176,8 @@ def create_notifications_table():
 create_notifications_table()
 
 @app.route("/friends")
+@login_required
 def friends():
-    if "user_id" not in session:
-        return redirect("/")
     user_id = session["user_id"]
     conn = get_db()
     cursor = conn.cursor()
@@ -190,9 +202,8 @@ def friends():
     return render_template("friends.html", friends = friends_list)
 
 @app.route("/add_friends")
+@login_required
 def add_friends():
-    if "user_id" not in session:
-        return redirect("/")
     user_id = session["user_id"]
     conn = get_db()
     cursor = conn.cursor()
@@ -216,6 +227,7 @@ def add_friends():
     return render_template("add_friends.html", users=users)
 
 @app.route("/add_friend/<int:receiver_id>")
+@login_required
 def add_friend(receiver_id):
     sender_id = session["user_id"]
     if sender_id == receiver_id:
@@ -230,10 +242,8 @@ def add_friend(receiver_id):
     return redirect("/friends") 
 
 @app.route("/notifications")
+@login_required
 def notifications():
-    if "user_id" not in session:
-        return redirect("/")
-
     user_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
@@ -264,10 +274,8 @@ def notifications():
     return render_template("notifications.html", notifications=all_notifications)
 
 @app.route("/clear_notifications")
+@login_required
 def clear_notifications():
-    if 'user_id' not in session:
-        return redirect('/login')
-
     conn = get_db()
     conn.execute("DELETE FROM notifications WHERE user_id=?", (session['user_id'],))
     conn.commit()
@@ -276,9 +284,8 @@ def clear_notifications():
     return redirect('/notifications')
 
 @app.route("/accept/<int:sender_id>")
+@login_required
 def accept_request(sender_id):
-    if "user_id" not in session:
-        return redirect("/")
     receiver_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
@@ -296,9 +303,8 @@ def accept_request(sender_id):
     return redirect("/notifications")
 
 @app.route("/reject/<int:sender_id>")
+@login_required
 def reject_request(sender_id):
-    if "user_id" not in session:
-        return redirect("/")
     receiver_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
@@ -349,9 +355,8 @@ def create_responses_table():
 create_responses_table()
 
 @app.route("/travel/<travel_type>")
+@login_required
 def travel_page(travel_type):
-    if "user_id" not in session:
-        return redirect("/")
     user_id = session["user_id"]
     destination = request.args.get("destination", "")
     start_date = request.args.get("start_date", "")
@@ -424,6 +429,7 @@ def travel_page(travel_type):
     return render_template("travel_with_new.html" if travel_type=='new' else "travel_with_known.html", requests=request_lists)
 
 @app.route('/add_trip/<travel_type>', methods=['POST'])
+@login_required
 def add_trip(travel_type):
     user_id = session['user_id']
     destination = request.form.get("destination", "")
@@ -442,6 +448,7 @@ def add_trip(travel_type):
     return redirect(f'/travel/{travel_type}')
 
 @app.route("/respond_trip/<int:request_id>/<status>")
+@login_required
 def respond_trip(request_id, status):
     user_id = session['user_id']
 
@@ -471,7 +478,7 @@ def respond_trip(request_id, status):
 
     conn.commit()
 
-    # 🔥 Notify creator
+    # Notify creator
     if status == 'accepted':
         cur.execute("""
             SELECT creator_id, destination FROM travel_requests WHERE id=?
@@ -503,10 +510,8 @@ def reset_trips():
     return "Trips reset successfully"
 
 @app.route("/my_trips")
+@login_required
 def my_trips():
-    if "user_id" not in session:
-        return redirect("/")
-
     user_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
@@ -528,10 +533,8 @@ def my_trips():
     return render_template("my_trips.html", trips=trips)
 
 @app.route("/delete_trip/<int:trip_id>")
+@login_required
 def delete_trip(trip_id):
-    if "user_id" not in session:
-        return redirect("/")
-
     user_id = session["user_id"]
     conn = get_db()
     conn.execute("""
@@ -549,10 +552,8 @@ def delete_trip(trip_id):
     return redirect("/my_trips")
 
 @app.route("/edit_trip/<int:trip_id>", methods=["GET", "POST"])
+@login_required
 def edit_trip(trip_id):
-    if "user_id" not in session:
-        return redirect("/")
-
     user_id = session["user_id"]
     conn = get_db()
 
@@ -598,6 +599,7 @@ def create_messages_table():
 create_messages_table()
 
 @app.route("/send_message", methods=["POST"])
+@login_required
 def send_message():
     data = request.get_json()
     sender = session["user_id"]
@@ -615,6 +617,7 @@ def send_message():
     return {"status": "ok"}
 
 @app.route("/get_messages/<int:other_user>")
+@login_required
 def get_messages(other_user):
     user_id = session["user_id"]
 
@@ -642,10 +645,8 @@ def get_messages(other_user):
     return result
 
 @app.route("/chat/<int:other_user_id>")
+@login_required
 def chat(other_user_id):
-    if "user_id" not in session:
-        return redirect("/")
-
     user_id = session["user_id"]
     conn = get_db()
     cur = conn.cursor()
