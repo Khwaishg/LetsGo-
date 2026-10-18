@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from werkzeug.exceptions import RequestEntityTooLarge
+from datetime import date
 
 load_dotenv()
 app = Flask(__name__)
@@ -333,12 +334,36 @@ def create_travel_requests_table():
                  min_age INTEGER,
                  max_age INTEGER,
                  travel_type TEXT,
-                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                 expired_notified INTEGER DEFAULT 0)
                 """)
     conn.commit()
     conn.close()
-
 create_travel_requests_table()
+
+def notify_expired_trips():
+    today = date.today().isoformat()  
+    conn = get_db()
+    expired = conn.execute("""
+        SELECT id, creator_id, destination
+        FROM travel_requests
+        WHERE end_date < ? AND expired_notified = 0
+    """, (today,)).fetchall()
+    for trip in expired:
+        conn.execute("""
+            INSERT INTO notifications (user_id, message)
+            VALUES (?, ?)
+        """, (trip["creator_id"], f"Your trip to {trip['destination']} has expired."))
+        conn.execute("""
+            UPDATE travel_requests SET expired_notified = 1 WHERE id = ?
+        """, (trip["id"],))
+    conn.commit()
+    conn.close()
+
+@app.before_request
+def check_expired():
+    if request.endpoint != "static":
+        notify_expired_trips()
 
 def create_responses_table():
     conn = get_db()
@@ -437,6 +462,15 @@ def add_trip(travel_type):
     end_date = request.form.get("end_date", "")
     min_age = request.form.get("min_age", "")
     max_age = request.form.get("max_age", "")
+    try:
+        start = date.fromisoformat(start_date)
+        end = date.fromisoformat(end_date)
+    except ValueError:
+        return "Please enter valid dates. <a href='/travel/" + travel_type + "'>Go back</a>"
+    if date.today() >= start:
+        return "Start date must be after today's date. <a href='/travel/" + travel_type + "'>Go back</a>"
+    if end < start:
+        return "End date cannot be before the start date. <a href='/travel/" + travel_type + "'>Go back</a>"
     conn = get_db()
     conn.execute("""
                 INSERT INTO travel_requests
@@ -501,6 +535,7 @@ def respond_trip(request_id, status):
     return redirect(request.referrer)
 
 @app.route("/reset_trips")
+@login_required
 def reset_trips():
     conn = get_db()
     conn.execute("DELETE FROM travel_requests")
@@ -556,29 +591,36 @@ def delete_trip(trip_id):
 def edit_trip(trip_id):
     user_id = session["user_id"]
     conn = get_db()
-
     if request.method == "POST":
         destination = request.form["destination"]
         start_date = request.form["start_date"]
         end_date = request.form["end_date"]
         min_age = request.form["min_age"]
         max_age = request.form["max_age"]
-
+        try:
+            start = date.fromisoformat(start_date)
+            end = date.fromisoformat(end_date)
+        except ValueError:
+            conn.close()
+            return "Please enter valid dates. <a href='/edit_trip/" + str(trip_id) + "'>Go back</a>"
+        if date.today() >= start:
+            conn.close()
+            return "Start date must be after today's date. <a href='/edit_trip/" + str(trip_id) + "'>Go back</a>"
+        if end < start:
+            conn.close()
+            return "End date cannot be before the start date. <a href='/edit_trip/" + str(trip_id) + "'>Go back</a>"
         conn.execute("""
             UPDATE travel_requests
-            SET destination=?, start_date=?, end_date=?, min_age=?, max_age=?
+            SET destination=?, start_date=?, end_date=?, min_age=?, max_age=?, expired_notified=0
             WHERE id=? AND creator_id=?
         """, (destination, start_date, end_date, min_age, max_age, trip_id, user_id))
-
         conn.commit()
         conn.close()
         return redirect("/my_trips")
-
     trip = conn.execute("""
         SELECT * FROM travel_requests
         WHERE id=? AND creator_id=?
     """, (trip_id, user_id)).fetchone()
-
     conn.close()
     return render_template("edit_trip.html", trip=trip)
 
